@@ -1,0 +1,289 @@
+basePath: /
+definitions:
+  database.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
+    type: object
+  database.WebhookGovDAO:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      lastCheckedID:
+        type: integer
+      type:
+        type: string
+      url:
+        type: string
+      userID:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@samouraiworld.com
+    name: Samourai Team
+    url: https://github.com/samouraiworld/gnomonitoring
+  description: Comprehensive blockchain monitoring and alerting system for Gno validators
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Gno Monitoring Backend API
+  version: 1.0.0
+paths:
+  /Participation:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve validator participation rates for a specified time period
+      parameters:
+      - description: Time period (e.g., '24h', '7d', '30d')
+        in: query
+        name: period
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Participation rate data
+          schema:
+            items:
+              type: object
+            type: array
+        "400":
+          description: Bad request - missing period parameter
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get validator participation rates
+      tags:
+      - monitoring
+  /block_height:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the current block height from the monitoring system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Block height information
+          schema:
+            additionalProperties:
+              format: int64
+              type: integer
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get current block height
+      tags:
+      - monitoring
+  /latest_incidents:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the latest incidents for a specified time period
+      parameters:
+      - description: Time period (e.g., '24h', '7d', '30d')
+        in: query
+        name: period
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of incidents
+          schema:
+            items:
+              type: object
+            type: array
+        "400":
+          description: Bad request - missing period parameter
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get latest incidents
+      tags:
+      - monitoring
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/database.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: User already exists
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - DevAuth: []
+      summary: Create user
+      tags:
+      - users
+  /webhooks/govdao:
+    get:
+      consumes:
+      - application/json
+      description: Get all governance webhooks for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of governance webhooks
+          schema:
+            items:
+              $ref: '#/definitions/database.WebhookGovDAO'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - DevAuth: []
+      summary: List governance webhooks
+      tags:
+      - governance-webhooks
+    post:
+      consumes:
+      - application/json
+      description: Create a new governance webhook for the authenticated user
+      parameters:
+      - description: Webhook data
+        in: body
+        name: webhook
+        required: true
+        schema:
+          $ref: '#/definitions/database.WebhookGovDAO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Webhook created successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Webhook already exists
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      - DevAuth: []
+      summary: Create governance webhook
+      tags:
+      - governance-webhooks
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+  DevAuth:
+    description: 'Development mode: Use any user ID for testing'
+    in: header
+    name: X-Debug-UserID
+    type: apiKey
+swagger: "2.0"

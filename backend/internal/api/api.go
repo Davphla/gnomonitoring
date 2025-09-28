@@ -10,8 +10,10 @@ import (
 	"strconv"
 
 	clerkhttp "github.com/clerk/clerk-sdk-go/v2/http"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	clerk "github.com/clerk/clerk-sdk-go/v2"
+	_ "github.com/samouraiworld/gnomonitoring/backend/docs" // Import generated docs
 	"github.com/samouraiworld/gnomonitoring/backend/internal"
 	"github.com/samouraiworld/gnomonitoring/backend/internal/database"
 	"github.com/samouraiworld/gnomonitoring/backend/internal/gnovalidator"
@@ -40,6 +42,19 @@ func authUserIDFromContext(r *http.Request) (string, error) {
 
 // ========== GOVDAO ==========
 
+// ListWebhooks godoc
+// @Summary List governance webhooks
+// @Description Get all governance webhooks for the authenticated user
+// @Tags governance-webhooks
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Security DevAuth
+// @Success 200 {array} database.WebhookGovDAO "List of governance webhooks"
+// @Failure 400 {object} map[string]string "Bad request"
+// @Failure 401 {object} map[string]string "Unauthorized"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /webhooks/govdao [get]
 func ListWebhooksHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	EnableCORS(w)
 	userID, err := authUserIDFromContext(r)
@@ -56,6 +71,21 @@ func ListWebhooksHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	json.NewEncoder(w).Encode(webhooks)
 }
 
+// CreateWebhook godoc
+// @Summary Create governance webhook
+// @Description Create a new governance webhook for the authenticated user
+// @Tags governance-webhooks
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Security DevAuth
+// @Param webhook body database.WebhookGovDAO true "Webhook data"
+// @Success 201 {object} map[string]string "Webhook created successfully"
+// @Failure 400 {object} map[string]string "Bad request"
+// @Failure 401 {object} map[string]string "Unauthorized"
+// @Failure 409 {object} map[string]string "Webhook already exists"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /webhooks/govdao [post]
 func CreateWebhookHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	EnableCORS(w)
 
@@ -282,7 +312,21 @@ func UpdateMonitoringWebhookHandler(w http.ResponseWriter, r *http.Request, db *
 	w.WriteHeader(http.StatusOK)
 }
 
-// =======================USER==========================================func CreateUserhandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+// CreateUser godoc
+// @Summary Create user
+// @Description Create a new user account
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Security DevAuth
+// @Param user body database.User true "User data"
+// @Success 201 {object} map[string]string "User created successfully"
+// @Failure 400 {object} map[string]string "Bad request"
+// @Failure 401 {object} map[string]string "Unauthorized"
+// @Failure 409 {object} map[string]string "User already exists"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /users [post]
 func CreateUserhandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	EnableCORS(w)
 
@@ -591,7 +635,15 @@ func DeleteAlertContactHandler(w http.ResponseWriter, r *http.Request, db *gorm.
 	w.Write([]byte("Alert contact deleted"))
 }
 
-// ====================== Block Height ============
+// GetBlockHeight godoc
+// @Summary Get current block height
+// @Description Retrieves the current block height from the monitoring system
+// @Tags monitoring
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]int64 "Block height information"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /block_height [get]
 func Getblockheight(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	EnableCORS(w)
 	if r.Method != http.MethodGet {
@@ -607,7 +659,17 @@ func Getblockheight(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	json.NewEncoder(w).Encode(map[string]int64{"last_stored": lastStored})
 }
 
-// ======================last incident ==================================
+// GetLatestIncidents godoc
+// @Summary Get latest incidents
+// @Description Retrieve the latest incidents for a specified time period
+// @Tags monitoring
+// @Accept json
+// @Produce json
+// @Param period query string true "Time period (e.g., '24h', '7d', '30d')"
+// @Success 200 {array} object "List of incidents"
+// @Failure 400 {object} map[string]string "Bad request - missing period parameter"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /latest_incidents [get]
 func Getlastincident(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	EnableCORS(w)
 	if r.Method != http.MethodGet {
@@ -628,7 +690,17 @@ func Getlastincident(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	json.NewEncoder(w).Encode(incident)
 }
 
-// ============================ Participation Rate ========================
+// GetParticipationRate godoc
+// @Summary Get validator participation rates
+// @Description Retrieve validator participation rates for a specified time period
+// @Tags monitoring
+// @Accept json
+// @Produce json
+// @Param period query string true "Time period (e.g., '24h', '7d', '30d')"
+// @Success 200 {array} object "Participation rate data"
+// @Failure 400 {object} map[string]string "Bad request - missing period parameter"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /Participation [get]
 func Getarticipation(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 
 	EnableCORS(w)
@@ -762,6 +834,7 @@ func StartWebhookAPI(db *gorm.DB) {
 		}
 
 	})))
+
 	// ====================== Dashboard =================
 	mux.HandleFunc("/block_height", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -805,6 +878,16 @@ func StartWebhookAPI(db *gorm.DB) {
 		}
 
 	})
+
+	// ====================== Swagger Documentation =================
+	// Swagger UI handler
+	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
+
+	// Redirect root to Swagger UI
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/swagger/index.html", http.StatusMovedPermanently)
+	})
+
 	// Starting the HTTP server -
 	addr := ":" + internal.Config.BackendPort
 

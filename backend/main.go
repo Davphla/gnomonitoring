@@ -12,6 +12,31 @@ import (
 	"github.com/samouraiworld/gnomonitoring/backend/internal/scheduler"
 )
 
+// @title Gno Monitoring Backend API
+// @version 1.0.0
+// @description Comprehensive blockchain monitoring and alerting system for Gno validators
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name Samourai Team
+// @contact.url https://github.com/samouraiworld/gnomonitoring
+// @contact.email support@samouraiworld.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
+// @securityDefinitions.apikey DevAuth
+// @in header
+// @name X-Debug-UserID
+// @description Development mode: Use any user ID for testing
+
 // var db *sql.DB
 
 func main() {
