@@ -382,7 +382,7 @@ func ProcessProposal(tx Transaction, who string, db *gorm.DB) {
 					}
 
 					txurl := fmt.Sprintf(
-						"https://gnoscan.io/transactions/details?chainId=test8&txhash=%s",
+						"https://gnoscan.io/transactions/details?chainId=test9&txhash=%s",
 						txData.Hash,
 					)
 					log.Printf("tx URL %s", txurl)
